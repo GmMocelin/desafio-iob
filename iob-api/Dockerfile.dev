@@ -1,0 +1,16 @@
+FROM ruby:3.2.9
+WORKDIR /app
+
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+  build-essential libpq-dev git curl && rm -rf /var/lib/apt/lists/*
+
+# Instala gems no path padrão do container
+COPY Gemfile Gemfile.lock ./
+RUN bundle lock --add-platform x86_64-linux || true
+RUN bundle install --jobs 4 --retry 3
+
+# Código do app (será sobrescrito pelo volume, mas ajuda no build)
+COPY . .
+
+# Comando padrão: instala gems (se mudou Gemfile) + prepara DB + sobe server
+CMD bash -lc "bundle install && bin/rails db:prepare && exec bin/rails s -b 0.0.0.0 -p 3000"

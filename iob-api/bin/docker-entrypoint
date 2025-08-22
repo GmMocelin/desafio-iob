@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -e
+
+# 1) mata server.pid se existir
+rm -f tmp/pids/server.pid
+
+# 2) garante gems - rápido se já estiverem no cache da imagem
+bundle check || bundle install
+
+# 3) espera o Postgres responder (depende do seu DATABASE_URL)
+echo "Waiting for database..."
+until bin/rails db:version >/dev/null 2>&1; do
+  sleep 2
+done
+
+# 4) cria DB + roda migrations (idempotente)
+bin/rails db:prepare
+
+# 5) roda seeds só se a tabela estiver vazia (ou deixe sem o IF p/ sempre)
+if ! bin/rails runner "exit Country.exists? ? 0 : 1"; then
+  echo "Seeding database..."
+  bin/rails db:seed
+fi
+
+# 6) executa o comando (padrão: rails server)
+exec "$@"

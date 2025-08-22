@@ -1,0 +1,21 @@
+# variáveis locais
+.env
+
+# Rails (iob-api)
+iob-api/.bundle/
+iob-api/log/
+iob-api/tmp/
+iob-api/storage/
+iob-api/vendor/bundle
+iob-api/node_modules
+iob-api/.byebug_history
+
+# Node/Vite (iob-web)
+iob-web/node_modules/
+iob-web/.vite/
+iob-web/dist/
+
+# SO / editores
+.DS_Store
+Thumbs.db
+.vscode/
